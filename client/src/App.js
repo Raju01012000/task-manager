@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
+const API = "https://task-manager-r7h0.onrender.com"; // 🔥 LIVE BACKEND
+
 function App() {
   const [tasks, setTasks] = useState([]);
   const [text, setText] = useState("");
@@ -14,7 +16,7 @@ function App() {
       setLoading(true);
       setError("");
 
-      const res = await fetch("http://localhost:5000/tasks");
+      const res = await fetch(`${API}/tasks`);
       const data = await res.json();
 
       setTasks(data);
@@ -29,7 +31,7 @@ function App() {
     if (!text) return;
 
     try {
-      await fetch("http://localhost:5000/tasks", {
+      await fetch(`${API}/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -46,7 +48,7 @@ function App() {
 
   const toggleTask = async (task) => {
     try {
-      await fetch(`http://localhost:5000/tasks/${task._id}`, {
+      await fetch(`${API}/tasks/${task._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -65,7 +67,7 @@ function App() {
     if (!confirmDelete) return;
 
     try {
-      await fetch(`http://localhost:5000/tasks/${id}`, {
+      await fetch(`${API}/tasks/${id}`, {
         method: "DELETE",
       });
 
@@ -82,7 +84,7 @@ function App() {
 
   const updateTask = async () => {
     try {
-      await fetch(`http://localhost:5000/tasks/${editId}`, {
+      await fetch(`${API}/tasks/${editId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: editText }),
@@ -117,18 +119,12 @@ function App() {
           </button>
         </div>
 
-        {/* ERROR */}
         {error && <p style={{ color: "red" }}>{error}</p>}
-
-        {/* LOADING */}
         {loading && <p>Loading... ⏳</p>}
-
-        {/* EMPTY */}
         {!loading && tasks.length === 0 && (
           <p style={{ opacity: 0.7 }}>No tasks yet 😴</p>
         )}
 
-        {/* TASK LIST */}
         {!loading &&
           tasks.map((task) => (
             <div className="task" key={task._id}>
