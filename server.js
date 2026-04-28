@@ -1,19 +1,18 @@
 const express = require("express");
-
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 const app = express();
 
-const cors = require("cors");
 app.use(cors());
-
 app.use(express.json());
 
-mongoose.connect("mongodb://127.0.0.1:27017/task-manager")
+// 🔥 IMPORTANT CHANGE
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected ✅"))
   .catch((err) => console.log(err));
 
-//UPDATED SCHEMA (validation added)
+// Schema
 const taskSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -25,7 +24,6 @@ const taskSchema = new mongoose.Schema({
   }
 });
 
-// Model
 const Task = mongoose.model("Task", taskSchema);
 
 // Routes
@@ -33,7 +31,6 @@ app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
-// GET all tasks
 app.get("/tasks", async (req, res) => {
   try {
     const allTasks = await Task.find();
@@ -43,7 +40,6 @@ app.get("/tasks", async (req, res) => {
   }
 });
 
-// POST new task
 app.post("/tasks", async (req, res) => {
   try {
     const newTask = new Task(req.body);
@@ -54,7 +50,6 @@ app.post("/tasks", async (req, res) => {
   }
 });
 
-// DELETE task
 app.delete("/tasks/:id", async (req, res) => {
   try {
     const id = req.params.id;
@@ -65,7 +60,6 @@ app.delete("/tasks/:id", async (req, res) => {
   }
 });
 
-// UPDATE task
 app.put("/tasks/:id", async (req, res) => {
   try {
     const id = req.params.id;
@@ -82,7 +76,9 @@ app.put("/tasks/:id", async (req, res) => {
   }
 });
 
-// Server start
-app.listen(5000, () => {
-  console.log("Server started on port 5000");
+// 🔥 PORT FIX (IMPORTANT for Render)
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
 });
