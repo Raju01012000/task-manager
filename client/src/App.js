@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
-const API = "https://task-manager-r7h0.onrender.com"; // 🔥 LIVE BACKEND
+const API = "https://task-manager-r7h0.onrender.com";
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -19,7 +19,14 @@ function App() {
       const res = await fetch(`${API}/tasks`);
       const data = await res.json();
 
-      setTasks(data);
+      // 🔥 FIX
+      if (Array.isArray(data)) {
+        setTasks(data);
+      } else {
+        console.error("Not array:", data);
+        setTasks([]);
+        setError("⚠️ Server problem");
+      }
     } catch (err) {
       setError("⚠️ Server error. Try again!");
     } finally {
@@ -121,6 +128,7 @@ function App() {
 
         {error && <p style={{ color: "red" }}>{error}</p>}
         {loading && <p>Loading... ⏳</p>}
+
         {!loading && tasks.length === 0 && (
           <p style={{ opacity: 0.7 }}>No tasks yet 😴</p>
         )}
