@@ -11,29 +11,73 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // 🔐 TOKEN
+  const [token, setToken] = useState(localStorage.getItem("token") || "");
+
+  /* ======================
+     LOGIN (TEMP TEST)
+  ====================== */
+  const login = async () => {
+    try {
+      const res = await fetch(`${API}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email: "test@test.com",
+          password: "123456"
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        setToken(data.token);
+        fetchTasks();
+      } else {
+        setError("Login failed");
+      }
+    } catch {
+      setError("Login error");
+    }
+  };
+
+  /* ======================
+     FETCH TASKS
+  ====================== */
   const fetchTasks = async () => {
+    if (!token) return;
+
     try {
       setLoading(true);
       setError("");
 
-      const res = await fetch(`${API}/tasks`);
+      const res = await fetch(`${API}/tasks`, {
+        headers: {
+          Authorization: token
+        }
+      });
+
       const data = await res.json();
 
-      // 🔥 FIX
       if (Array.isArray(data)) {
         setTasks(data);
       } else {
-        console.error("Not array:", data);
         setTasks([]);
         setError("⚠️ Server problem");
       }
-    } catch (err) {
-      setError("⚠️ Server error. Try again!");
+    } catch {
+      setError("⚠️ Server error");
     } finally {
       setLoading(false);
     }
   };
 
+  /* ======================
+     ADD TASK
+  ====================== */
   const addTask = async () => {
     if (!text) return;
 
@@ -42,25 +86,32 @@ function App() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: token
         },
-        body: JSON.stringify({ title: text }),
+        body: JSON.stringify({ title: text })
       });
 
       setText("");
       fetchTasks();
     } catch {
-      setError("⚠️ Failed to add task");
+      setError("⚠️ Failed to add");
     }
   };
 
+  /* ======================
+     TOGGLE
+  ====================== */
   const toggleTask = async (task) => {
     try {
       await fetch(`${API}/tasks/${task._id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token
+        },
         body: JSON.stringify({
-          completed: !task.completed,
-        }),
+          completed: !task.completed
+        })
       });
 
       fetchTasks();
@@ -69,13 +120,18 @@ function App() {
     }
   };
 
+  /* ======================
+     DELETE
+  ====================== */
   const deleteTask = async (id) => {
-    const confirmDelete = window.confirm("Delete this task?");
-    if (!confirmDelete) return;
+    if (!window.confirm("Delete?")) return;
 
     try {
       await fetch(`${API}/tasks/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: token
+        }
       });
 
       fetchTasks();
@@ -84,6 +140,9 @@ function App() {
     }
   };
 
+  /* ======================
+     EDIT
+  ====================== */
   const startEdit = (task) => {
     setEditId(task._id);
     setEditText(task.title);
@@ -93,8 +152,11 @@ function App() {
     try {
       await fetch(`${API}/tasks/${editId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: editText }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token
+        },
+        body: JSON.stringify({ title: editText })
       });
 
       setEditId(null);
@@ -106,13 +168,38 @@ function App() {
   };
 
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    if (token) fetchTasks();
+  }, [token]);
+
+  /* ======================
+     UI
+  ====================== */
+
+  // 🔐 If not logged in
+  if (!token) {
+    return (
+      <div className="container">
+        <div className="card">
+          <h2>Login Required 🔐</h2>
+          <button onClick={login}>Login</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container">
       <div className="card">
         <h1 className="title">🚀 Task Manager</h1>
+
+        <button
+          onClick={() => {
+            localStorage.removeItem("token");
+            setToken("");
+          }}
+        >
+          Logout
+        </button>
 
         <div className="input-box">
           <input
@@ -130,7 +217,7 @@ function App() {
         {loading && <p>Loading... ⏳</p>}
 
         {!loading && tasks.length === 0 && (
-          <p style={{ opacity: 0.7 }}>No tasks yet 😴</p>
+          <p>No tasks yet 😴</p>
         )}
 
         {!loading &&
@@ -142,37 +229,21 @@ function App() {
                     value={editText}
                     onChange={(e) => setEditText(e.target.value)}
                   />
-                  <button className="add-btn" onClick={updateTask}>
-                    Save
-                  </button>
+                  <button onClick={updateTask}>Save</button>
                 </>
               ) : (
                 <>
                   <span
                     onClick={() => toggleTask(task)}
                     style={{
-                      textDecoration: task.completed ? "line-through" : "none",
-                      opacity: task.completed ? 0.6 : 1,
+                      textDecoration: task.completed ? "line-through" : "none"
                     }}
                   >
                     {task.title}
                   </span>
 
-                  <div style={{ display: "flex", gap: "5px" }}>
-                    <button
-                      className="edit-btn"
-                      onClick={() => startEdit(task)}
-                    >
-                      ✏️
-                    </button>
-
-                    <button
-                      className="delete-btn"
-                      onClick={() => deleteTask(task._id)}
-                    >
-                      🗑️
-                    </button>
-                  </div>
+                  <button onClick={() => startEdit(task)}>✏️</button>
+                  <button onClick={() => deleteTask(task._id)}>🗑️</button>
                 </>
               )}
             </div>
