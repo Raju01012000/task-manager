@@ -18,6 +18,7 @@ function App() {
   /* ======================
      SIGNUP
   ====================== */
+
   const signup = async () => {
     try {
       const res = await fetch(`${API}/signup`, {
@@ -32,6 +33,7 @@ function App() {
       });
 
       const data = await res.json();
+
       alert(JSON.stringify(data));
     } catch {
       setError("Signup failed");
@@ -41,6 +43,7 @@ function App() {
   /* ======================
      LOGIN
   ====================== */
+
   const login = async () => {
     try {
       const res = await fetch(`${API}/login`, {
@@ -70,6 +73,7 @@ function App() {
   /* ======================
      FETCH TASKS
   ====================== */
+
   const fetchTasks = async () => {
     if (!token) return;
 
@@ -101,6 +105,7 @@ function App() {
   /* ======================
      ADD TASK
   ====================== */
+
   const addTask = async () => {
     if (!text) return;
 
@@ -111,7 +116,9 @@ function App() {
           "Content-Type": "application/json",
           Authorization: token,
         },
-        body: JSON.stringify({ title: text }),
+        body: JSON.stringify({
+          title: text,
+        }),
       });
 
       setText("");
@@ -122,8 +129,9 @@ function App() {
   };
 
   /* ======================
-     TOGGLE
+     TOGGLE TASK
   ====================== */
+
   const toggleTask = async (task) => {
     try {
       await fetch(`${API}/tasks/${task._id}`, {
@@ -144,10 +152,12 @@ function App() {
   };
 
   /* ======================
-     DELETE
+     DELETE TASK
   ====================== */
+
   const deleteTask = async (id) => {
-    if (!window.confirm("Delete?")) return;
+    if (!window.confirm("Delete task?"))
+      return;
 
     try {
       await fetch(`${API}/tasks/${id}`, {
@@ -164,8 +174,9 @@ function App() {
   };
 
   /* ======================
-     EDIT
+     EDIT TASK
   ====================== */
+
   const startEdit = (task) => {
     setEditId(task._id);
     setEditText(task.title);
@@ -179,11 +190,14 @@ function App() {
           "Content-Type": "application/json",
           Authorization: token,
         },
-        body: JSON.stringify({ title: editText }),
+        body: JSON.stringify({
+          title: editText,
+        }),
       });
 
       setEditId(null);
       setEditText("");
+
       fetchTasks();
     } catch {
       setError("⚠️ Edit failed");
@@ -199,24 +213,33 @@ function App() {
   }, [token]);
 
   /* ======================
-     UI
+     LOGIN PAGE
   ====================== */
 
   if (!token) {
     return (
       <div className="container">
         <div className="card">
-          <h2>🔐 Login Required</h2>
+          <h2 className="login-title">
+            🔐 Login Required
+          </h2>
 
-          <button onClick={signup}>Signup</button>
+          <button
+            className="auth-btn signup-btn"
+            onClick={signup}
+          >
+            Signup
+          </button>
 
-          <br />
-          <br />
-
-          <button onClick={login}>Login</button>
+          <button
+            className="auth-btn login-btn"
+            onClick={login}
+          >
+            Login
+          </button>
 
           {error && (
-            <p style={{ color: "red" }}>
+            <p className="error-text">
               {error}
             </p>
           )}
@@ -224,6 +247,10 @@ function App() {
       </div>
     );
   }
+
+  /* ======================
+     MAIN UI
+  ====================== */
 
   return (
     <div className="container">
@@ -233,6 +260,7 @@ function App() {
         </h1>
 
         <button
+          className="logout-btn"
           onClick={() => {
             localStorage.removeItem("token");
             setToken("");
@@ -260,7 +288,7 @@ function App() {
         </div>
 
         {error && (
-          <p style={{ color: "red" }}>
+          <p className="error-text">
             {error}
           </p>
         )}
@@ -288,41 +316,47 @@ function App() {
                     }
                   />
 
-                  <button onClick={updateTask}>
-                    Save
+                  <button
+                    className="save-btn"
+                    onClick={updateTask}
+                  >
+                    SAVE
                   </button>
                 </>
               ) : (
                 <>
                   <span
+                    className={
+                      task.completed
+                        ? "completed-task"
+                        : ""
+                    }
                     onClick={() =>
                       toggleTask(task)
                     }
-                    style={{
-                      textDecoration:
-                        task.completed
-                          ? "line-through"
-                          : "none",
-                    }}
                   >
                     {task.title}
                   </span>
 
-                  <button
-                    onClick={() =>
-                      startEdit(task)
-                    }
-                  >
-                    ✏️
-                  </button>
+                  <div className="task-buttons">
+                    <button
+                      className="edit-btn"
+                      onClick={() =>
+                        startEdit(task)
+                      }
+                    >
+                      EDIT
+                    </button>
 
-                  <button
-                    onClick={() =>
-                      deleteTask(task._id)
-                    }
-                  >
-                    🗑️
-                  </button>
+                    <button
+                      className="delete-btn"
+                      onClick={() =>
+                        deleteTask(task._id)
+                      }
+                    >
+                      DELETE
+                    </button>
+                  </div>
                 </>
               )}
             </div>
