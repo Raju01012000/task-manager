@@ -11,7 +11,9 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [token, setToken] = useState(
+    localStorage.getItem("token") || ""
+  );
 
   /* ======================
      SIGNUP
@@ -21,12 +23,12 @@ function App() {
       const res = await fetch(`${API}/signup`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: "test@test.com",
-          password: "123456"
-        })
+          password: "123456",
+        }),
       });
 
       const data = await res.json();
@@ -44,12 +46,12 @@ function App() {
       const res = await fetch(`${API}/login`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: "test@test.com",
-          password: "123456"
-        })
+          password: "123456",
+        }),
       });
 
       const data = await res.json();
@@ -77,8 +79,8 @@ function App() {
 
       const res = await fetch(`${API}/tasks`, {
         headers: {
-          Authorization: token
-        }
+          Authorization: token,
+        },
       });
 
       const data = await res.json();
@@ -107,9 +109,9 @@ function App() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: token
+          Authorization: token,
         },
-        body: JSON.stringify({ title: text })
+        body: JSON.stringify({ title: text }),
       });
 
       setText("");
@@ -128,11 +130,11 @@ function App() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: token
+          Authorization: token,
         },
         body: JSON.stringify({
-          completed: !task.completed
-        })
+          completed: !task.completed,
+        }),
       });
 
       fetchTasks();
@@ -151,8 +153,8 @@ function App() {
       await fetch(`${API}/tasks/${id}`, {
         method: "DELETE",
         headers: {
-          Authorization: token
-        }
+          Authorization: token,
+        },
       });
 
       fetchTasks();
@@ -175,9 +177,9 @@ function App() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: token
+          Authorization: token,
         },
-        body: JSON.stringify({ title: editText })
+        body: JSON.stringify({ title: editText }),
       });
 
       setEditId(null);
@@ -189,7 +191,11 @@ function App() {
   };
 
   useEffect(() => {
-    if (token) fetchTasks();
+    if (token) {
+      fetchTasks();
+    }
+
+    // eslint-disable-next-line
   }, [token]);
 
   /* ======================
@@ -203,10 +209,17 @@ function App() {
           <h2>🔐 Login Required</h2>
 
           <button onClick={signup}>Signup</button>
-          <br /><br />
+
+          <br />
+          <br />
+
           <button onClick={login}>Login</button>
 
-          {error && <p style={{ color: "red" }}>{error}</p>}
+          {error && (
+            <p style={{ color: "red" }}>
+              {error}
+            </p>
+          )}
         </div>
       </div>
     );
@@ -215,7 +228,9 @@ function App() {
   return (
     <div className="container">
       <div className="card">
-        <h1 className="title">🚀 Task Manager</h1>
+        <h1 className="title">
+          🚀 Task Manager
+        </h1>
 
         <button
           onClick={() => {
@@ -231,14 +246,25 @@ function App() {
             type="text"
             placeholder="Enter task..."
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) =>
+              setText(e.target.value)
+            }
           />
-          <button className="add-btn" onClick={addTask}>
+
+          <button
+            className="add-btn"
+            onClick={addTask}
+          >
             Add
           </button>
         </div>
 
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && (
+          <p style={{ color: "red" }}>
+            {error}
+          </p>
+        )}
+
         {loading && <p>Loading... ⏳</p>}
 
         {!loading && tasks.length === 0 && (
@@ -247,28 +273,56 @@ function App() {
 
         {!loading &&
           tasks.map((task) => (
-            <div className="task" key={task._id}>
+            <div
+              className="task"
+              key={task._id}
+            >
               {editId === task._id ? (
                 <>
                   <input
                     value={editText}
-                    onChange={(e) => setEditText(e.target.value)}
+                    onChange={(e) =>
+                      setEditText(
+                        e.target.value
+                      )
+                    }
                   />
-                  <button onClick={updateTask}>Save</button>
+
+                  <button onClick={updateTask}>
+                    Save
+                  </button>
                 </>
               ) : (
                 <>
                   <span
-                    onClick={() => toggleTask(task)}
+                    onClick={() =>
+                      toggleTask(task)
+                    }
                     style={{
-                      textDecoration: task.completed ? "line-through" : "none"
+                      textDecoration:
+                        task.completed
+                          ? "line-through"
+                          : "none",
                     }}
                   >
                     {task.title}
                   </span>
 
-                  <button onClick={() => startEdit(task)}>✏️</button>
-                  <button onClick={() => deleteTask(task._id)}>🗑️</button>
+                  <button
+                    onClick={() =>
+                      startEdit(task)
+                    }
+                  >
+                    ✏️
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      deleteTask(task._id)
+                    }
+                  >
+                    🗑️
+                  </button>
                 </>
               )}
             </div>
