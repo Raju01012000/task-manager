@@ -11,11 +11,33 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // 🔐 TOKEN
   const [token, setToken] = useState(localStorage.getItem("token") || "");
 
   /* ======================
-     LOGIN (TEMP TEST)
+     SIGNUP
+  ====================== */
+  const signup = async () => {
+    try {
+      const res = await fetch(`${API}/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email: "test@test.com",
+          password: "123456"
+        })
+      });
+
+      const data = await res.json();
+      alert(JSON.stringify(data));
+    } catch {
+      setError("Signup failed");
+    }
+  };
+
+  /* ======================
+     LOGIN
   ====================== */
   const login = async () => {
     try {
@@ -35,7 +57,6 @@ function App() {
       if (data.token) {
         localStorage.setItem("token", data.token);
         setToken(data.token);
-        fetchTasks();
       } else {
         setError("Login failed");
       }
@@ -175,13 +196,17 @@ function App() {
      UI
   ====================== */
 
-  // 🔐 If not logged in
   if (!token) {
     return (
       <div className="container">
         <div className="card">
-          <h2>Login Required 🔐</h2>
+          <h2>🔐 Login Required</h2>
+
+          <button onClick={signup}>Signup</button>
+          <br /><br />
           <button onClick={login}>Login</button>
+
+          {error && <p style={{ color: "red" }}>{error}</p>}
         </div>
       </div>
     );
