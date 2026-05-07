@@ -11,6 +11,10 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // NEW
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   const [token, setToken] = useState(
     localStorage.getItem("token") || ""
   );
@@ -20,21 +24,32 @@ function App() {
   ====================== */
 
   const signup = async () => {
+    if (!email || !password) {
+      setError("Enter email & password");
+      return;
+    }
+
     try {
+      setError("");
+
       const res = await fetch(`${API}/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: "test@test.com",
-          password: "123456",
+          email,
+          password,
         }),
       });
 
       const data = await res.json();
 
-      alert(JSON.stringify(data));
+      if (data.message) {
+        alert("Signup successful ✅");
+      } else {
+        setError("Signup failed");
+      }
     } catch {
       setError("Signup failed");
     }
@@ -45,15 +60,22 @@ function App() {
   ====================== */
 
   const login = async () => {
+    if (!email || !password) {
+      setError("Enter email & password");
+      return;
+    }
+
     try {
+      setError("");
+
       const res = await fetch(`${API}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: "test@test.com",
-          password: "123456",
+          email,
+          password,
         }),
       });
 
@@ -63,7 +85,7 @@ function App() {
         localStorage.setItem("token", data.token);
         setToken(data.token);
       } else {
-        setError("Login failed");
+        setError("Invalid email or password");
       }
     } catch {
       setError("Login error");
@@ -223,6 +245,26 @@ function App() {
           <h2 className="login-title">
             🔐 Login Required
           </h2>
+
+          <input
+            type="email"
+            placeholder="Enter email"
+            value={email}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
+            className="auth-input"
+          />
+
+          <input
+            type="password"
+            placeholder="Enter password"
+            value={password}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+            className="auth-input"
+          />
 
           <button
             className="auth-btn signup-btn"

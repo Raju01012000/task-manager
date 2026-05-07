@@ -6,7 +6,7 @@
 }
 
 body {
-  height: 100vh;
+  min-height: 100vh;
   background: linear-gradient(
     135deg,
     #0f2027,
@@ -46,6 +46,20 @@ body {
   margin-bottom: 20px;
   font-size: 30px;
 }
+
+/* AUTH INPUTS */
+
+.auth-input {
+  width: 100%;
+  padding: 14px;
+  margin-top: 12px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+}
+
+/* TASK INPUT */
 
 .input-box {
   display: flex;
@@ -119,7 +133,7 @@ input {
   transform: scale(1.05);
 }
 
-/* LOGOUT */
+/* LOGOUT BUTTON */
 
 .logout-btn {
   background: #ff4b2b;
@@ -137,7 +151,7 @@ input {
   transform: scale(1.05);
 }
 
-/* TASK */
+/* TASK CARD */
 
 .task {
   display: flex;
@@ -232,4 +246,23 @@ input {
 .error-text {
   color: #ff5252;
   margin-top: 15px;
+  font-weight: bold;
+}
+
+/* MOBILE */
+
+@media (max-width: 500px) {
+  .card {
+    width: 100%;
+  }
+
+  .task {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .task-buttons {
+    width: 100%;
+    justify-content: center;
+  }
 }
