@@ -129,7 +129,7 @@ function App() {
   ====================== */
 
   const addTask = async () => {
-    if (!text) return;
+    if (!text.trim()) return;
 
     try {
       await fetch(`${API}/tasks`, {
@@ -319,6 +319,12 @@ function App() {
             onChange={(e) =>
               setText(e.target.value)
             }
+
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                addTask();
+              }
+            }}
           />
 
           <button
@@ -356,6 +362,12 @@ function App() {
                         e.target.value
                       )
                     }
+
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        updateTask();
+                      }
+                    }}
                   />
 
                   <button
