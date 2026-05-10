@@ -11,9 +11,12 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // NEW
+  // AUTH
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // SEARCH
+  const [search, setSearch] = useState("");
 
   const [token, setToken] = useState(
     localStorage.getItem("token") || ""
@@ -311,6 +314,17 @@ function App() {
           Logout
         </button>
 
+        {/* SEARCH */}
+        <input
+          type="text"
+          placeholder="🔍 Search tasks..."
+          value={search}
+          onChange={(e) =>
+            setSearch(e.target.value)
+          }
+          className="search-input"
+        />
+
         <div className="input-box">
           <input
             type="text"
@@ -319,7 +333,6 @@ function App() {
             onChange={(e) =>
               setText(e.target.value)
             }
-
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 addTask();
@@ -348,73 +361,84 @@ function App() {
         )}
 
         {!loading &&
-          tasks.map((task) => (
-            <div
-              className="task"
-              key={task._id}
-            >
-              {editId === task._id ? (
-                <>
-                  <input
-                    value={editText}
-                    onChange={(e) =>
-                      setEditText(
-                        e.target.value
-                      )
-                    }
-
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        updateTask();
+          tasks
+            .filter((task) =>
+              task.title
+                .toLowerCase()
+                .includes(
+                  search.toLowerCase()
+                )
+            )
+            .map((task) => (
+              <div
+                className="task"
+                key={task._id}
+              >
+                {editId === task._id ? (
+                  <>
+                    <input
+                      value={editText}
+                      onChange={(e) =>
+                        setEditText(
+                          e.target.value
+                        )
                       }
-                    }}
-                  />
-
-                  <button
-                    className="save-btn"
-                    onClick={updateTask}
-                  >
-                    SAVE
-                  </button>
-                </>
-              ) : (
-                <>
-                  <span
-                    className={
-                      task.completed
-                        ? "completed-task"
-                        : ""
-                    }
-                    onClick={() =>
-                      toggleTask(task)
-                    }
-                  >
-                    {task.title}
-                  </span>
-
-                  <div className="task-buttons">
-                    <button
-                      className="edit-btn"
-                      onClick={() =>
-                        startEdit(task)
-                      }
-                    >
-                      EDIT
-                    </button>
+                      onKeyDown={(e) => {
+                        if (
+                          e.key === "Enter"
+                        ) {
+                          updateTask();
+                        }
+                      }}
+                    />
 
                     <button
-                      className="delete-btn"
+                      className="save-btn"
+                      onClick={updateTask}
+                    >
+                      SAVE
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <span
+                      className={
+                        task.completed
+                          ? "completed-task"
+                          : ""
+                      }
                       onClick={() =>
-                        deleteTask(task._id)
+                        toggleTask(task)
                       }
                     >
-                      DELETE
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
+                      {task.title}
+                    </span>
+
+                    <div className="task-buttons">
+                      <button
+                        className="edit-btn"
+                        onClick={() =>
+                          startEdit(task)
+                        }
+                      >
+                        EDIT
+                      </button>
+
+                      <button
+                        className="delete-btn"
+                        onClick={() =>
+                          deleteTask(
+                            task._id
+                          )
+                        }
+                      >
+                        DELETE
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
       </div>
     </div>
   );
