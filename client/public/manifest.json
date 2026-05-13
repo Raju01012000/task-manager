@@ -3,9 +3,9 @@
   "name": "Task Manager App",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/1828/1828817.png",
-      "type": "image/png",
-      "sizes": "192x192"
+      "src": "favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "64x64 32x32 24x24 16x16"
     }
   ],
   "start_url": ".",
